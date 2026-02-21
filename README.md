@@ -39,17 +39,8 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 
 ## Getting Started
 
-1. **Draft**: Provide your SRS (Software Requirements Specification) to an AI agent to generate an initial GASD design.
+1. **Draft**: Provide your User Stories or SRS (Software Requirements Specification) to an AI agent to generate an initial GASD design.
 2. **Review & Refine**: Humans review the GASD file for architectural correctness, security, and specific constraints.
 3. **Generate**: Provide the finalized GASD to the agent with a `TARGET` (e.g., Python, Rust) to get production-ready, consistent code.
 
 ---
-
----
-
-## Project Status
-
-- [x] GASD 1.0.0 Official Specification
-- [x] GASD Self-Referential Metamodel
-- [x] Redesign Blueprint Approved
-- [ ] GASD Reference Implementation Updates (In Progress)
