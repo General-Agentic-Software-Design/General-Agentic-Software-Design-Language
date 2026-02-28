@@ -35,7 +35,7 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 - **[Self-Definition](gasd-1.0.0.gasd)**: The official AI-readable ground truth and metamodel of the language.
 - **[Tutorial](GASD_Tutorial.md)**: A comprehensive guide for engineers to master GASD.
 - **[Examples](examples/GASD_Examples.md)**: Real-world design patterns and algorithmic strategies.
-- **[Design Plan](Design_Plan.md)**: The underlying philosophy of the Design Bridge.
+- **[Design Principles](Design_Principles.md)**: The underlying philosophy of the Design Bridge.
 
 ## Getting Started
 
