@@ -23,7 +23,7 @@ We've written a 6-part series on how this works in practice:
 5️⃣ Human + AI — The New Collaboration Model
 6️⃣ GASD 2.0 — The Multi-Agent Future
 
-📖 Series: [Stop Vibe Coding](./part-1-vibe-coding-vs-rigorous-engineering.md) · ⭐ Walkthrough: [From User Story to Working Code](./part-4-user-story-to-code-walkthrough.md) · 🌟 GitHub: [General-Agentic-Software-Design-Language](https://github.com/ming-ai/General-Agentic-Software-Design-Language)
+📖 Series: [Stop Vibe Coding](https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language/blob/main/blogs/Stop%20Vibe%20Coding.%20Start%20Spec%20Engineering/part-1-vibe-coding-vs-rigorous-engineering.md) · ⭐ Walkthrough: [From User Story to Working Code](https://github.com/General-Agentic-Software-Design/General-Agentic-Software-Design-Language/blob/main/blogs/Stop%20Vibe%20Coding.%20Start%20Spec%20Engineering/part-4-user-story-to-code-walkthrough.md) · 🌟 GitHub: [General-Agentic-Software-Design-Language](https://github.com/ming-ai/General-Agentic-Software-Design-Language)
 
 
 *Code is cheap. Design decisions are gold.*
