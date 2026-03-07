@@ -130,7 +130,7 @@ COMPONENT ComponentDefinition:
 /// A discrete step within a FLOW.
 TYPE FlowStep:
     number: Integer
-    action: Enum(VALIDATE, ACHIEVE, CREATE, PERSIST, RETURN, LOG, ENSURE, MATCH, IF)
+    action: Enum(VALIDATE, ACHIEVE, CREATE, PERSIST, RETURN, LOG, ENSURE, MATCH, IF, UPDATE, APPLY, THROW)
     target: String
     annotations: List<Annotation> @optional
 

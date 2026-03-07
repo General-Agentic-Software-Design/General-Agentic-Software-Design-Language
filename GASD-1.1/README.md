@@ -52,5 +52,6 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 ### Version 1.1.0
 
 - **Literal Types** (via GEP-2): Specify that a field must match an exact string or number, enabling discriminant fields, strict state transitions, and constant values. See the [Tutorial](GASD_Tutorial.md) and [Specification](GASD_Specification.md) for details.
+- **Formalized Flow Keywords** (via GEP-3): Explicitly defines `TRANSFORM`, `ON_ERROR`, `THROW`, `UPDATE`, and `APPLY` to support deterministic mutations and error handling. See the [Specification](GASD_Specification.md#flow-keywords) for details.
 
 ---

@@ -327,6 +327,9 @@ FLOW register_new_customer(request_data: RequestData) -> String:
 | `TRANSFORM` | Data transformation with annotation | `@hash("bcrypt")` → exact impl |
 | `@async` | Execution mode | Agent generates async code |
 | `ON_ERROR` | Error handling directive | Exact error type generated |
+| `THROW` | Surfaces an error explicitly | Exact error type/message |
+| `UPDATE` | Primitive for mutating an existing record | Fields locked by TYPE contract |
+| `APPLY` | Applies a strategy/transformation to target | Strategy applied exactly as specified |
 
 ---
 
@@ -624,6 +627,9 @@ action        ::= "VALIDATE" identifier
                 | "ACHIEVE" string_literal [ block ]
                 | "CREATE" identifier ":" block
                 | "PERSIST" identifier "via" identifier
+                | "UPDATE" identifier "SET" identifier "=" value
+                | "APPLY" identifier "TO" value
+                | "THROW" identifier
                 | "RETURN" expr
                 | "LOG" string_literal
 
@@ -633,12 +639,14 @@ control_flow  ::= "ENSURE" condition [ "OTHERWISE" action ]
                 
 match_case    ::= ( string_literal | "DEFAULT" ) "->" flow_step
 
-block         ::= indent { property | annotation | flow_step } dedent
+block         ::= indent { property | annotation | flow_step | on_error_clause } dedent
+on_error_clause ::= "ON_ERROR" ":" action
 property      ::= identifier ":" value
 
 value         ::= string_literal | number_literal | boolean_literal | identifier | expr
 
-expr          ::= identifier { "." identifier } [ "(" [ arg_list ] ")" ]
+expr          ::= "TRANSFORM" "(" value "," annotations ")"
+                | identifier { "." identifier } [ "(" [ arg_list ] ")" ]
 arg_list      ::= value { "," value }
 
 (* --- Lexical Tokens --- *)
@@ -696,3 +704,5 @@ See: [examples/user_management.gasd](examples/user_management.gasd)
 ### Version 1.1.0
 
 Version 1.1.0 introduces **Literal Types** (via GEP-2) to the core specification, allowing data contracts to enforce exact value matches (e.g., `status: 404`). This is formally defined in Section 5.2.
+
+Version 1.1.0 also formalizes **Missing Flow Keywords** (via GEP-3), explicitly defining `TRANSFORM`, `ON_ERROR`, `THROW`, `UPDATE`, and `APPLY` within the specification and formal EBNF grammar to ensure deterministic transpilation of these operations.
