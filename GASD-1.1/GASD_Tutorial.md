@@ -113,7 +113,7 @@ For large systems, you can split your design into multiple GASD files using `NAM
 
 ### Example Structure
 
-```
+```text
 project/
 ├── common/
 │   └── types.gasd      (NAMESPACE: "common")
@@ -213,6 +213,7 @@ TRACE: "AC-042-1 (System must support Visa and Mastercard)"
 
 COMPONENT StripeAdapter @status("REVIEW_REQUIRED"):
     @agent_note("Selected Stripe because AC-042-1 requires Visa/Mastercard support")
+    @trace(#AC-042.1)
     INTERFACE: process(payment: Payment) -> Result<Void>
 ```
 
@@ -284,7 +285,7 @@ Describe the logic in deterministic steps.
 FLOW send_alert(request):
     MATCH request.priority:
         HIGH -> ACHIEVE "Send Push" AND "Send Email" @async
-        MEDIUM -> ACHIEVE "Send Push"
+        MEDIUM -> ACHIEVE "Send Push": priority_score = (request.score + 1) * 2
         LOW -> ACHIEVE "Log to Buffer"
     RETURN Result.success
 ```

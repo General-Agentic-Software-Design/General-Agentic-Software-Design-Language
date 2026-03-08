@@ -118,6 +118,11 @@ TYPE MethodSignature:
     return_type: String
     annotations: List<Annotation> @optional
 
+/// A reference to an external document, pattern, or asset.
+TYPE ResourceItem:
+    name: String
+    annotations: List<Annotation> @optional
+
 /// An architectural building block.
 COMPONENT ComponentDefinition:
     PATTERN: "Architectural Block"

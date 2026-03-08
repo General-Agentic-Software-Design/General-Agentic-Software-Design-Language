@@ -576,7 +576,10 @@ The following is the formal Extended Backus-Naur Form (EBNF) grammar for GASD.
 (* GASD Grammar *)
 
 gasd_file     ::= { section }
-section       ::= context_dir | namespace_stmt | import_stmt | decision_blk | type_def | component_def | flow_def | strategy_def | constraint
+section       ::= context_dir | namespace_stmt | import_stmt | decision_blk | type_def | component_def | flow_def | strategy_def | constraint | resources_stmt
+
+resources_stmt::= "RESOURCES" ":" indent { resource_item } dedent
+resource_item ::= "-" string_literal [ annotations ]
 
 (* --- Context & Directives --- *)
 context_dir   ::= ( "CONTEXT" | "TARGET" | "TRACE" ) ":" value { "," value }
@@ -623,21 +626,25 @@ flow_def      ::= "FLOW" identifier "(" [ param_list ] ")" [ "->" type_expr ] ":
 
 flow_step     ::= step_number "." ( action | control_flow )
 
-action        ::= "VALIDATE" identifier
-                | "ACHIEVE" string_literal [ block ]
+action        ::= "VALIDATE" expr
+                | "ACHIEVE" string_literal [ ":" assignments ] [ block ]
                 | "CREATE" identifier ":" block
                 | "PERSIST" identifier "via" identifier
-                | "UPDATE" identifier "SET" identifier "=" value
-                | "APPLY" identifier "TO" value
-                | "THROW" identifier
+                | "UPDATE" identifier "SET" identifier "=" expr
+                | "APPLY" identifier "TO" expr
+                | "THROW" identifier [ "(" arg_list ")" ]
                 | "RETURN" expr
                 | "LOG" string_literal
+
+assignments   ::= property { "," property }
 
 control_flow  ::= "ENSURE" condition [ "OTHERWISE" action ]
                 | "MATCH" expr ":" indent { match_case } dedent
                 | "IF" condition ":" indent { flow_step } dedent [ "ELSE" ":" indent { flow_step } dedent ]
                 
-match_case    ::= ( string_literal | "DEFAULT" ) "->" flow_step
+match_case    ::= pattern_list "->" ( flow_step | action )
+pattern_list  ::= pattern { "|" pattern }
+pattern       ::= [ "CONTAINS" ] ( string_literal | number_literal | identifier | "DEFAULT" )
 
 block         ::= indent { property | annotation | flow_step | on_error_clause } dedent
 on_error_clause ::= "ON_ERROR" ":" action
@@ -645,17 +652,25 @@ property      ::= identifier ":" value
 
 value         ::= string_literal | number_literal | boolean_literal | identifier | expr
 
-expr          ::= "TRANSFORM" "(" value "," annotations ")"
+expr          ::= term { bin_op term }
+term          ::= "TRANSFORM" "(" value "," annotations ")"
+                | value
                 | identifier { "." identifier } [ "(" [ arg_list ] ")" ]
+bin_op        ::= "+" | "-" | "*" | "/" | "^" | "==" | "!=" | ">" | "<" | ">=" | "<="
 arg_list      ::= value { "," value }
 
 (* --- Lexical Tokens --- *)
-identifier    ::= [a-zA-Z_] { [a-zA-Z0-9_.] }
+identifier    ::= [a-zA-Z_#] { [a-zA-Z0-9_.-] }
 string_literal::= '"' { character } '"'
 indent        ::= (* implied indentation increase *)
 dedent        ::= (* implied indentation decrease *)
-annotations   ::= "@" identifier [ "(" value ")" ] { "@" identifier [ "(" value ")" ] }
+annotations   ::= "@" identifier [ "(" value_list ")" ] { "@" identifier [ "(" value_list ")" ] }
+value_list    ::= value { "," value }
 ```
+
+### Soft Keywords
+
+Keywords in positions where they are clearly identifiers (e.g., as field names or component names) SHALL be allowed. Language specifications treat these as "soft keywords" when unambiguously used.
 
 ---
 
@@ -663,7 +678,7 @@ annotations   ::= "@" identifier [ "(" value ")" ] { "@" identifier [ "(" value 
 
 The most minimal GASD file possible, demonstrating basic structure.
 
-```
+```gasd
 CONTEXT: "General Software"
 TARGET: "Any"
 TRACE: "SRS-000 (Hello World)"
@@ -706,3 +721,5 @@ See: [examples/user_management.gasd](examples/user_management.gasd)
 Version 1.1.0 introduces **Literal Types** (via GEP-2) to the core specification, allowing data contracts to enforce exact value matches (e.g., `status: 404`). This is formally defined in Section 5.2.
 
 Version 1.1.0 also formalizes **Missing Flow Keywords** (via GEP-3), explicitly defining `TRANSFORM`, `ON_ERROR`, `THROW`, `UPDATE`, and `APPLY` within the specification and formal EBNF grammar to ensure deterministic transpilation of these operations.
+
+Version 1.1.0 introduces **Grammar Flexibility, Pattern Matching, and Resource Specification** (via GEP-4), bringing the grammar in line with expert usage. It expands identifier logic, permits complex expressions inside action statements, supports generic `RESOURCES` definition blocks, and introduces powerful `CONTAINS` and OR features to pattern matching.
