@@ -4,7 +4,7 @@
 GEP: 4
 Title: Enhancing GASD 1.1.0: Grammar Flexibility, Pattern Matching, and Resource Specification
 Author: Agentic Software Design (https://github.com/agentic-software-design)
-Status: Draft
+Status: Accepted
 Type: Standards Track
 Created: 2026-03-07
 ```
@@ -20,6 +20,7 @@ This proposal addresses several critical gaps in the GASD 1.1.0 specification id
 # Motivation
 
 The currently published GASD 1.1.0 EBNF grammar is slightly too restrictive compared to the "expert" designs required for complex architectural specifications. Specifically:
+
 * Flow actions are too rigid to support complex math or structured logic descriptions.
 * Identifiers lack support for symbols like hyphens and trace labels (e.g., `#AC-1`) which are common in requirements traceability.
 * Certain "soft keywords" like `STATUS` or `DATE` are currently blocked from being used as field names.
@@ -31,6 +32,7 @@ The currently published GASD 1.1.0 EBNF grammar is slightly too restrictive comp
 # Specification
 
 ### 1. Action Rule Permissivity
+
 The `action` and `expr` rules are updated to support math operators and more complex expressions.
 
 ```ebnf
@@ -48,6 +50,7 @@ assignments   ::= property { "," property }
 ```
 
 Update `expr` to support binary operators:
+
 ```ebnf
 expr          ::= term { bin_op term }
 term          ::= "TRANSFORM" "(" value "," annotations ")"
@@ -57,17 +60,21 @@ bin_op        ::= "+" | "-" | "*" | "/" | "^" | "==" | "!=" | ">" | "<" | ">=" |
 ```
 
 ### 2. Identifier and Symbol Extensions
+
 The lexical tokens for `identifier` are expanded to support trace labels, hyphens, and versioning.
 
 ```ebnf
 identifier    ::= [a-zA-Z_#] { [a-zA-Z0-9_.-] }
 ```
+
 New symbols to support: Backticks (``` ` ```), Caret (`^`), Single Quote (`'`).
 
 ### 3. "Soft Keywords"
+
 Keywords in positions where they are clearly identifiers (e.g., as field names or component names) SHALL be allowed. This is a parser implementation requirement to treat keywords as "soft" in non-ambiguous contexts.
 
 ### 4. Enhanced Pattern Matching (`MATCH`)
+
 Expand `match_case` to support OR patterns and the `CONTAINS` operator.
 
 ```ebnf
@@ -77,6 +84,7 @@ pattern       ::= [ "CONTAINS" ] ( string_literal | number_literal | identifier 
 ```
 
 ### 5. Metadata and RESOURCES section
+
 Add a new `resources_stmt` to the top-level `section` rule.
 
 ```ebnf
@@ -87,6 +95,7 @@ resource_item ::= "-" string_literal [ annotations ]
 ```
 
 ### 6. Shorthand Annotations
+
 Allow trace labels and more complex identifiers within annotations.
 
 ```ebnf
@@ -111,27 +120,28 @@ This proposal is largely backward compatible. Existing valid GASD files will rem
 # Reference Implementation (Optional)
 
 Update the GASD ANTLR4 grammar:
-1.  Relax `ID` token definition.
-2.  Add `bin_op` to the expression sub-grammar.
-3.  Add `RESOURCES` as a new top-level block handler.
-4.  Implement "soft keyword" logic for `STATUS`, `DATE`, `INPUT`, `OUTPUT`, and `INTERFACE`.
+
+1. Relax `ID` token definition.
+2. Add `bin_op` to the expression sub-grammar.
+3. Add `RESOURCES` as a new top-level block handler.
+4. Implement "soft keyword" logic for `STATUS`, `DATE`, `INPUT`, `OUTPUT`, and `INTERFACE`.
 
 ---
 
 # Test Plan
 
-*   **Acceptance Test**: `ACHIEVE "Calc": x = y * 2` parses successfully.
-*   **Acceptance Test**: `@trace(#AC-1)` parses successfully.
-*   **Acceptance Test**: `RESOURCES` block with bulleted list parses successfully.
-*   **Negative Test**: Unbalanced parentheses in complex expressions fail validation.
+* **Acceptance Test**: `ACHIEVE "Calc": x = y * 2` parses successfully.
+* **Acceptance Test**: `@trace(#AC-1)` parses successfully.
+* **Acceptance Test**: `RESOURCES` block with bulleted list parses successfully.
+* **Negative Test**: Unbalanced parentheses in complex expressions fail validation.
 
 ---
 
 # Traceability
 
-*   **Requirement**: Support complex expressions in FLOW steps.
-*   **Requirement**: Support requirements traceability via `#` identifiers.
-*   **Requirement**: Formalize `RESOURCES` section.
+* **Requirement**: Support complex expressions in FLOW steps.
+* **Requirement**: Support requirements traceability via `#` identifiers.
+* **Requirement**: Formalize `RESOURCES` section.
 
 ---
 

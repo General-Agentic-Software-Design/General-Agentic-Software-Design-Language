@@ -66,6 +66,7 @@ A GASD file is a **plain text** file, typically using **UTF-8** encoding. It is 
 5. **Flows** — Design-level logic
 6. **Strategies** — Algorithmic specifications
 7. **Constraints & Invariants** — Cross-cutting rules
+8. **Resources** — External references and documentation links
 
 ---
 
@@ -115,7 +116,7 @@ A GASD file **MUST** begin with the `CONTEXT` and `TARGET` directives. The `NAME
    - `IMPORT "common/types.gasd"`
    - `IMPORT "payment_service.gasd" AS Payment`
 
-3. **`TRACE`** — Links a design block or the entire file to upstream artifacts. Supports any traceable identifier — SRS requirements, User Stories, Epics, or Acceptance Criteria.
+3. **`TRACE`** — Links a design block or the entire file to upstream artifacts. Identifiers support trace labels with symbols like `#` and `-` (e.g., `#AC-042-1`).
 
 ```gasd
 CONTEXT: "Spring Boot microservice"
@@ -319,17 +320,17 @@ FLOW register_new_customer(request_data: RequestData) -> String:
 
 | Keyword | Purpose | Determinism Effect |
 |---|---|---|
-| `VALIDATE` | Triggers validation from TYPE constraints | Agent uses exact annotations |
+| `VALIDATE` | Triggers validation from TYPE constraints against an expression | Agent uses exact annotations |
 | `ENSURE ... OTHERWISE` | Guard clause with specified error | Exact error type/message |
-| `ACHIEVE` | High-level goal (agent fills logic) | Constrained by DECISION blocks |
+| `ACHIEVE` | High-level goal (can include property assignments) | Constrained by DECISION blocks |
 | `CREATE` | Object construction | Fields locked by TYPE contract |
 | `PERSIST` | Storage operation | Uses specified repository |
 | `TRANSFORM` | Data transformation with annotation | `@hash("bcrypt")` → exact impl |
 | `@async` | Execution mode | Agent generates async code |
 | `ON_ERROR` | Error handling directive | Exact error type generated |
 | `THROW` | Surfaces an error explicitly | Exact error type/message |
-| `UPDATE` | Primitive for mutating an existing record | Fields locked by TYPE contract |
-| `APPLY` | Applies a strategy/transformation to target | Strategy applied exactly as specified |
+| `UPDATE` | Mutates an existing record against an expression | Fields locked by TYPE contract |
+| `APPLY` | Applies a strategy/transformation to target expression | Strategy applied exactly as specified |
 
 ---
 
@@ -456,21 +457,41 @@ Deterministic branching construct.
 
 ```gasd
 MATCH [Expression]:
-    [Pattern] -> [Outcome | Action]
+    [Pattern] { "|" [Pattern] } -> [Outcome | Action]
     ...
     DEFAULT   -> [Fallback Outcome | Action]
 ```
 
 ```gasd
-MATCH discount_code:
-    "SummerSale" -> discount = base_price * 0.10
-    "Welcome"    -> discount = 5.00
-    DEFAULT      -> discount = 0
+MATCH request.role:
+    "admin" | "superadmin" -> ACHIEVE "Grant full access"
+    CONTAINS "manager"     -> ACHIEVE "Grant partial access"
+    DEFAULT                -> THROW UnauthorizedException
 ```
 
 ---
 
-## 12. Cross-Language Compatibility
+## 12. Resources — `RESOURCES`
+
+An optional top-level block to define external references, documentation links, or architectural assets that apply to the design. This allows the AI agent to refer to specific context when transpiling.
+
+### Formal Syntax
+
+```gasd
+RESOURCES:
+    - "[Resource Name/URI]" [Annotations]
+    ...
+```
+
+```gasd
+RESOURCES:
+    - "https://docs.stripe.com/api"
+    - "System Architecture PDF" @trace(#AC-100)
+```
+
+---
+
+## 13. Cross-Language Compatibility
 
 GASD is designed for transpilation to any major programming language.
 
@@ -485,7 +506,7 @@ GASD is designed for transpilation to any major programming language.
 
 The constraint system ensures that for the **same GASD file + same TARGET**, the output is identical:
 
-```
+```text
 GASD + TARGET:"Python" → always produces the same Python code
 GASD + TARGET:"Java"   → always produces the same Java code
 ```
@@ -494,11 +515,11 @@ GASD + TARGET:"Java"   → always produces the same Java code
 
 ---
 
-## 13. Standard Annotation Library
+## 14. Standard Annotation Library
 
 To ensure determinism, GASD recognizes a **Fixed Set** of annotations. Transpilers **MUST** support these standard annotations. Agents **MUST NOT** invent new annotations for functional logic.
 
-### 13.1 Data Validation Constraints
+### 14.1 Data Validation Constraints
 
 Used on `TYPE` fields to generate validation logic.
 
@@ -511,7 +532,7 @@ Used on `TYPE` fields to generate validation logic.
 | `@unique` | `[ (scope: Target) ]` | Enforces uniqueness (DB constraint or set check). |
 | `@default(val)` | `(Value)` | Sets default value if missing. |
 
-### 13.2 Architectural Directives
+### 14.2 Architectural Directives
 
 Used on `COMPONENT` or Global Context to guide structure.
 
@@ -522,7 +543,7 @@ Used on `COMPONENT` or Global Context to guide structure.
 | `@optimize(goal)` | `(String)` | Heuristic for agent implementation strategy (e.g. "speed"). |
 | `@transaction_type(t)` | `("SAGA"\|"ACID")` | Wraps flow in specific transaction manager. |
 
-### 13.3 Implementation Modifiers
+### 14.3 Implementation Modifiers
 
 Used inside `FLOW` steps.
 
@@ -534,7 +555,7 @@ Used inside `FLOW` steps.
 | `@algorithm(name)` | `(String)` | Selects specific algorithm (e.g. "bcrypt"). |
 | `@hash(algo)` | `(String)` | Specific transformation instruction. |
 
-### 13.4 Metadata & Lifecycle
+### 14.4 Metadata & Lifecycle
 
 Used for Human-AI collaboration (Ignored by Transpiler logic).
 
@@ -545,7 +566,7 @@ Used for Human-AI collaboration (Ignored by Transpiler logic).
 | `@agent_note(txt)` | `(String)` | AI explanation of choices. |
 | `@heuristic(txt)` | `(String)` | Algorithm selection reasoning. |
 
-### 13.5 Extended Library (Common Standards)
+### 14.5 Extended Library (Common Standards)
 
 These annotations are optional but highly recommended for production systems.
 
