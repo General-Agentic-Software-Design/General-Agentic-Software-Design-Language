@@ -12,6 +12,7 @@ GASD is an evolving standard. The specifications, tutorials, and examples are or
   * Includes GEP-2 (Literal Types).
   * Includes GEP-3 (Missing Flow Keywords: TRANSFORM, ON_ERROR, THROW, UPDATE, APPLY).
   * Includes GEP-4 (Grammar Flexibility, Pattern Matching, and Resource Specification).
+  * Includes GEP-5 (Mandatory Explicit VALIDATE AS TYPE Binding).
 * **[GASD 1.0 (Baseline)](./GASD-1.0/README.md)**
   * The initial release of the language.
 

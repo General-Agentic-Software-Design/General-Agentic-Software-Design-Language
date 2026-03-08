@@ -252,6 +252,58 @@ GASD supports **Literal Types**, where a specific value defines the type contrac
 | `"Review"` | Must be exactly this string. | Generated as a literal type (e.g., TypeScript `"Review"`). |
 | `404`      | Must be exactly this number. | Generated as a constant or literal value. |
 
+#### 5.3 Annotation Enforcement via VALIDATE Binding
+
+`@annotations` on TYPE fields declare **active contracts** — constraints that MUST be enforced when instances of that TYPE are validated.
+
+```gasd
+TYPE EmailAddress:
+    value: String @format("email") @min_length(5) @max_length(254)
+```
+
+**Mandatory Binding via `AS TYPE.X`**
+
+All `VALIDATE` statements **MUST** include an explicit `AS TYPE.TypeName` binding. This declares which TYPE's `@annotation` contracts are being enforced, establishing the **TYPE→FLOW binding**:
+
+```gasd
+FLOW validate_email(email: EmailAddress) -> Result<EmailAddress>:
+    1. VALIDATE email AS TYPE.EmailAddress
+    2. RETURN email
+```
+
+When this binding is declared:
+
+1. Transpiler generates runtime guard functions for all `@annotations`
+2. Guard functions check `@format`, `@min_length`, `@range`, etc.
+3. Test derivation pipeline routes boundary tests to this FLOW
+4. This FLOW becomes the authoritative enforcer of `EmailAddress`
+
+**Multiple Validators**
+
+Multiple FLOWs **MAY** validate the same TYPE. Each becomes a specialized enforcer:
+
+```gasd
+FLOW validate_email_format(email: EmailAddress) -> Result<EmailAddress>:
+    1. VALIDATE email AS TYPE.EmailAddress
+    2. RETURN email
+
+FLOW validate_email_uniqueness(email: EmailAddress, existing: List<EmailAddress>)
+    -> Result<EmailAddress>:
+    1. VALIDATE email AS TYPE.EmailAddress
+    2. ENSURE email NOT IN existing OTHERWISE THROW DuplicateError
+    3. RETURN email
+```
+
+**Unbound TYPEs**
+
+A TYPE with `@annotations` but **no** VALIDATE binding produces no runtime guards and no derived tests. Transpiler **SHOULD** warn: "TYPE X has @annotations but no VALIDATE binding."
+
+**Errors**
+
+- Transpiler **MUST** error if `VALIDATE` is used without `AS TYPE.X` binding
+- Transpiler **MUST** error if `AS` binding resolves to undefined TYPE
+- Transpiler **SHOULD** warn if TYPE has `@annotations` but no VALIDATE binding
+
 ---
 
 ## 6. Components & Interfaces — `COMPONENT`, `INTERFACE`
@@ -320,7 +372,7 @@ FLOW register_new_customer(request_data: RequestData) -> String:
 
 | Keyword | Purpose | Determinism Effect |
 |---|---|---|
-| `VALIDATE` | Triggers validation from TYPE constraints against an expression | Agent uses exact annotations |
+| `VALIDATE` | Triggers validation from TYPE constraints. Requires explicit binding: `VALIDATE expr AS TYPE.TypeName`. See §5.3. | Agent uses exact annotations |
 | `ENSURE ... OTHERWISE` | Guard clause with specified error | Exact error type/message |
 | `ACHIEVE` | High-level goal (can include property assignments) | Constrained by DECISION blocks |
 | `CREATE` | Object construction | Fields locked by TYPE contract |
@@ -647,7 +699,7 @@ flow_def      ::= "FLOW" identifier "(" [ param_list ] ")" [ "->" type_expr ] ":
 
 flow_step     ::= step_number "." ( action | control_flow )
 
-action        ::= "VALIDATE" expr
+action        ::= "VALIDATE" expr asBinding
                 | "ACHIEVE" string_literal [ ":" assignments ] [ block ]
                 | "CREATE" identifier ":" block
                 | "PERSIST" identifier "via" identifier
@@ -656,6 +708,11 @@ action        ::= "VALIDATE" expr
                 | "THROW" identifier [ "(" arg_list ")" ]
                 | "RETURN" expr
                 | "LOG" string_literal
+
+asBinding     ::= "AS" typePath
+typePath      ::= "TYPE" "." typeIdentifier { "." fieldIdentifier }
+typeIdentifier::= IDENTIFIER
+fieldIdentifier::= IDENTIFIER
 
 assignments   ::= property { "," property }
 
@@ -744,3 +801,5 @@ Version 1.1.0 introduces **Literal Types** (via GEP-2) to the core specification
 Version 1.1.0 also formalizes **Missing Flow Keywords** (via GEP-3), explicitly defining `TRANSFORM`, `ON_ERROR`, `THROW`, `UPDATE`, and `APPLY` within the specification and formal EBNF grammar to ensure deterministic transpilation of these operations.
 
 Version 1.1.0 introduces **Grammar Flexibility, Pattern Matching, and Resource Specification** (via GEP-4), bringing the grammar in line with expert usage. It expands identifier logic, permits complex expressions inside action statements, supports generic `RESOURCES` definition blocks, and introduces powerful `CONTAINS` and OR features to pattern matching.
+
+Version 1.1.0 introduces **Mandatory Explicit VALIDATE AS TYPE Binding** (via GEP-5). The `VALIDATE` keyword now **requires** `VALIDATE expr AS TYPE.TypeName` syntax, establishing explicit TYPE→FLOW binding for every validation step. This eliminates ambiguity in annotation enforcement, enabling deterministic test derivation and runtime guard generation. See §5.3.

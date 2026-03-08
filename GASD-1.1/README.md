@@ -54,5 +54,6 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 - **Literal Types** (via GEP-2): Specify that a field must match an exact string or number, enabling discriminant fields, strict state transitions, and constant values. See the [Tutorial](GASD_Tutorial.md) and [Specification](GASD_Specification.md) for details.
 - **Formalized Flow Keywords** (via GEP-3): Explicitly defines `TRANSFORM`, `ON_ERROR`, `THROW`, `UPDATE`, and `APPLY` to support deterministic mutations and error handling. See the [Specification](GASD_Specification.md#flow-keywords) for details.
 - **Grammar Flexibility, Pattern Matching, and Resources** (via GEP-4): Expands identifier syntax for requirements traceability (e.g., `#AC-1`), allows permissive math expressions in actions, enhances `MATCH` with `CONTAINS` and OR patterns, and formalizes the `RESOURCES` definition block.
+- **Mandatory Explicit VALIDATE AS TYPE Binding** (via GEP-5): Requires `VALIDATE expr AS TYPE.TypeName` on every validation step, establishing explicit TYPE→FLOW binding for deterministic annotation enforcement. See the [Specification](GASD_Specification.md#53-annotation-enforcement-via-validate-binding) for details.
 
 ---
