@@ -31,6 +31,14 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 - **Lock down Logic**: Use `FLOW` and `STRATEGY` with `@error_strategy` to define the steps and algorithms without writing raw code.
 - **Strict Compliance**: Fully RFC 2119 compliant (MUST, SHALL, SHOULD) for both human specifications and AI interpretations.
 
+## GASD Ecosystem
+
+The GASD language is supported by a growing ecosystem of tools and resources:
+
+- **[GASD Blog](https://general-agentic-software-design.github.io/)**: Read about the "why" behind GASD and the detailed reasoning for the Design Bridge philosophy.
+- **[VS Code Extension](https://github.com/General-Agentic-Software-Design/gasd-vscode-extension)**: Get expert-level support in your editor with syntax highlighting, IntelliSense, real-time diagnostics, and Mermaid visualizations.
+- **[GASD Parser & Validator](https://github.com/General-Agentic-Software-Design/GASD-Parser-Validator)**: The canonical tool for ensuring your designs are 100% compliant. Use it in **Self-Verification Loops** to eliminate AI hallucinations and design drift.
+
 ## Documentation
 
 - **[Specification](GASD_Specification.md)**: The official normative reference with strict grammar and compliance rules.

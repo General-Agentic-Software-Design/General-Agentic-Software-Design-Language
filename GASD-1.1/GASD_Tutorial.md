@@ -425,6 +425,10 @@ FLOW process_order(order):
 2. Try generating code from your first GASD file!
 3. Check out the [Operational Concerns Example](examples/operational_concerns.gasd) for production-scale design patterns.
 
----
+### 14.1 Tooling & Ecosystem
 
-- **Literal Types**: Instead of just specifying the shape of a variable (like `String` or `Integer`), you can now enforce that it must match an exact literal value (like `"Review"` or `404`). This bridges the gap to modern discriminated unions found in TypeScript and Python.
+To get the most out of GASD, use the official tools:
+
+- **[VS Code Extension](https://github.com/General-Agentic-Software-Design/gasd-vscode-extension)**: Provides syntax highlighting, IntelliSense for types and flows, real-time diagnostics (problem markers), and automatic Mermaid diagram generation for `FLOW` and `STRATEGY`.
+- **[GASD Parser & Validator](https://github.com/General-Agentic-Software-Design/GASD-Parser-Validator)**: Use this for **Self-Verification Loops**. By running the parser with the `--json` flag, agents can programmatically detect and fix semantic errors (like duplicate types or unknown dependencies) before presenting the design to a human. This mathematically eliminates "Agent Drift" and hallucinations.
+- **[GASD Blog](https://general-agentic-software-design.github.io/)**: Stay updated with the latest design patterns and deep dives into the philosophy of the Design Bridge.
