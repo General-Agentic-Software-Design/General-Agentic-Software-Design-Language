@@ -137,6 +137,7 @@ TYPE FlowStep:
     number: Integer
     action: Enum(VALIDATE, ACHIEVE, CREATE, PERSIST, RETURN, LOG, ENSURE, MATCH, IF, UPDATE, APPLY, THROW)
     target: String
+    binding: String // AS TYPE.X binding — REQUIRED for VALIDATE steps (GEP-5)
     annotations: List<Annotation> @optional
 
 /// A design-level logic flow.
@@ -182,6 +183,7 @@ TYPE MatchConstruct:
 CONSTRAINT: "A GASD Transpiler MUST NOT invent new annotations for functional logic."
 CONSTRAINT: "All database operations SHALL be documented via PERSIST or ACHIEVE."
 CONSTRAINT: "Every COMPONENT MUST expose an INTERFACE."
+CONSTRAINT: "VALIDATE steps MUST include AS TYPE.X binding. Transpiler MUST error if binding is missing or resolves to undefined TYPE."
 INVARIANT: "A FLOW MUST NOT contain implementation code."
 ENSURE: "Result<T> MUST force explicit handling of error states."
 

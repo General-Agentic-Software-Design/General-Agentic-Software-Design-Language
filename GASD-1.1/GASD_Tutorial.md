@@ -102,6 +102,33 @@ FLOW process_payment(amount, token):
 
 ---
 
+### 3.1 VALIDATE Binding: Mandatory `AS TYPE`
+
+When a FLOW uses `VALIDATE`, it **MUST** include an explicit `AS TYPE.TypeName` binding — declaring exactly which TYPE's `@annotation` contracts are being enforced.
+
+```gasd
+// Simple: explicit binding required
+FLOW validate_user(user: User) -> Result<User>:
+    1. VALIDATE user AS TYPE.User
+    2. RETURN user
+
+// Multi-TYPE: each VALIDATE requires its own binding
+FLOW validate_order_and_user(order: Order, user: User) -> Result<(Order, User)>:
+    1. VALIDATE order AS TYPE.Order
+    2. VALIDATE user AS TYPE.User
+    3. RETURN (order, user)
+
+// Transform: binding to the result TYPE
+FLOW transform_and_validate(raw: RawInput) -> Result<ProcessedData>:
+    1. ACHIEVE "Transform RawInput to ProcessedData"
+    2. VALIDATE result AS TYPE.ProcessedData
+    3. RETURN result
+```
+
+See §5.3 in the [Specification](GASD_Specification.md) for full details.
+
+---
+
 ## 4. Modular Design (Multi-File Support)
 
 For large systems, you can split your design into multiple GASD files using `NAMESPACE` and `IMPORT`.
