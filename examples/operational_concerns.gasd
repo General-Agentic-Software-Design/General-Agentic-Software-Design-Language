@@ -19,11 +19,13 @@ TRACE: "SRS-OBJ-001 (Production Readiness)"
 DECISION "Infrastructure Provider" @status("APPROVED"):
     CHOSEN: "AWS EKS (Elastic Kubernetes Service)"
     RATIONALE: "Requirement for high availability and auto-scaling"
+    ALTERNATIVES: ["GCP GKE", "Azure AKS"]
     AFFECTS: [*]
 
 DECISION "Deployment Rollout":
     CHOSEN: "Canary Release"
     RATIONALE: "Minimize blast radius for new feature deployments"
+    ALTERNATIVES: ["Blue-Green", "Rolling Update"]
     AFFECTS: [OrderProcessingService]
 
 // --- 2. Security Boundaries ---
@@ -32,18 +34,32 @@ TYPE UserCredentials @sensitive:
     password_hash: String @mask
     totp_secret: String @mask @encrypted
 
+TYPE UUID:
+    val: String
+
+TYPE Result:
+    success: Boolean
+
+TYPE Void:
+    done: Boolean
+
+TYPE SystemStatus:
+    code: String
+
 // --- 4. Error Handling, 5. Logging, & 6. Monitoring ---
 COMPONENT OrderProcessingService:
     INTERFACE:
-        process_order(order_id: UUID, user_id: UUID) -> Result<Void>
+        process_order(order_id: UUID, user_id: UUID) -> Result
 
-FLOW process_order(order_id, user_id) -> Result<Void>:
+FLOW process_order(order_id, user_id) -> Result:
     @authorized("ROLE_USER")
     @trace_id(order_id)
     
     1. LOG "Initiating order processing" @severity("INFO")
     
-    2. ACHIEVE "Validate Inventory"
+    2. VALIDATE order_id AS TYPE.UUID
+    3. VALIDATE user_id AS TYPE.UUID
+    4. ACHIEVE "Validate Inventory"
         ON_ERROR:
             LOG "Inventory validation failed" @severity("ERROR")
             UPDATE Metric "order_failures" @increment @labels(reason="inventory")
@@ -67,7 +83,7 @@ FLOW process_order(order_id, user_id) -> Result<Void>:
 
 COMPONENT HealthMonitor:
     INTERFACE:
-        check_system_health() -> Status
+        check_system_health() -> SystemStatus
 
 FLOW check_system_health():
     1. ACHIEVE "Check DB Connectivity"

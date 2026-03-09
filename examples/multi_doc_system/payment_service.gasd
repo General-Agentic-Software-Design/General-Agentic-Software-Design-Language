@@ -21,7 +21,7 @@ COMPONENT PaymentService:
         process_payment(request: PaymentRequest) -> Result<String>
 
 FLOW process_payment(request: PaymentRequest) -> Result<String>:
-    1. VALIDATE request
+    1. VALIDATE request AS TYPE.PaymentRequest
     2. LOG "Processing payment for user " + request.user.email
     3. MATCH request.amount.currency:
         "USD" -> ACHIEVE "Process Stripe Charge"

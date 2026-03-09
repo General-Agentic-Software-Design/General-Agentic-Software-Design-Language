@@ -15,10 +15,12 @@ TRACE: "SRS-001 (Checkout Flow)", "SRS-005 (Payment Security)"
 // 1. Design Decisions
 DECISION "ID Generation" @status("APPROVED"):
     CHOSEN: "UUID v4"
+    ALTERNATIVES: ["Snowflake ID", "Atomic Counter"]
     AFFECTS: [Order.id]
 
 DECISION "Payment Integration":
     CHOSEN: "Stripe API"
+    ALTERNATIVES: ["PayPal SDK", "Adyen API"]
     AFFECTS: [CheckoutService.process]
 
 // 2. Type Contracts
@@ -43,7 +45,7 @@ COMPONENT CheckoutService:
 FLOW process(request: OrderRequest):
     @error_strategy("Fail-Fast")
 
-    1. VALIDATE request
+    1. VALIDATE request AS TYPE.OrderRequest
     
     // 2. CHECK INVENTORY
     // If stock is missing, we must fail immediately (no compensation needed yet).
@@ -59,3 +61,7 @@ FLOW process(request: OrderRequest):
         status: "PAID"
     5. PERSIST Order via OrderRepository
     6. RETURN Result.success(Order)
+
+TYPE Order:
+    id: UUID
+    status: String

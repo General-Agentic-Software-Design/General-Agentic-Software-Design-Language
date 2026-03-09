@@ -17,11 +17,13 @@ TRACE: "SRS-101 (User Registration)", "SRS-105 (Security)"
 DECISION "Password Hashing" @status("APPROVED"):
     CHOSEN: "Argon2id"
     RATIONALE: "Current security best practice for GPU resistance"
+    ALTERNATIVES: ["bcrypt", "scrypt"]
     AFFECTS: [AuthService, User.password_hash]
 
 DECISION "Primary Key Strategy":
     CHOSEN: "UUID v7"
     RATIONALE: "Time-ordered UUIDs for better database indexing performance"
+    ALTERNATIVES: ["UUID v4", "ULID"]
     AFFECTS: [User.id]
 
 // --- 3. Types & Contracts ---
@@ -39,6 +41,8 @@ TYPE User:
 TYPE RegistrationRequest:
     email: String @format("email")
     password: String @min_length(12) @constraint("Must include special char")
+
+TYPE EmailProvider: id: UUID
 
 // --- 4. Components & Interfaces ---
 COMPONENT AuthService @status("APPROVED"):
@@ -60,7 +64,7 @@ COMPONENT UserRepository @mockable:
 FLOW register(req: RegistrationRequest) -> String:
     @error_strategy("Exception-based")
 
-    1. VALIDATE req
+    1. VALIDATE req AS TYPE.RegistrationRequest
     2. ENSURE UserRepository.exist_by_email(req.email) IS FALSE
         OTHERWISE THROW ConflictException("Email already registered")
     

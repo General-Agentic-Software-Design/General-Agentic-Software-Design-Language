@@ -1,4 +1,5 @@
 CONTEXT: "Shared Library"
+TARGET: "Any"
 NAMESPACE: "com.acme.common"
 
 /*
@@ -21,3 +22,9 @@ TYPE UserInfo:
     user_id: UUID
     email: String @format("email")
     role: Enum(ADMIN, USER, GUEST)
+
+TYPE UUID:
+    val: String
+
+TYPE Decimal:
+    val: Float
