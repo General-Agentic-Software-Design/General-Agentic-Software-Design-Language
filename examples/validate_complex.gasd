@@ -48,12 +48,34 @@ TYPE PaymentInfo:
 DECISION "Payment Provider":
     CHOSEN: "Stripe"
     RATIONALE: "Supports all required payment methods per SRS-305"
+    ALTERNATIVES: ["Braintree", "Adyen"]
     AFFECTS: [PaymentService]
+
+TYPE PaymentService: id: UUID
 
 DECISION "Inventory Strategy":
     CHOSEN: "Optimistic Reservation"
     RATIONALE: "Reduces lock contention for high-throughput order processing"
+    ALTERNATIVES: ["Pessimistic Locking", "No Reservation"]
     AFFECTS: [InventoryService, OrderProcessingService]
+
+COMPONENT InventoryService:
+    INTERFACE:
+        check(id: UUID) -> Boolean
+COMPONENT CustomerRepository:
+    INTERFACE:
+        find(id: UUID) -> Customer
+COMPONENT OrderRepository:
+    INTERFACE:
+        save(order: Order) -> Void
+TYPE UUID:
+    val: String
+
+TYPE Decimal:
+    val: Float
+
+TYPE Result:
+    success: Boolean
 
 // --- Components ---
 
@@ -107,7 +129,7 @@ FLOW validate_order_details(order: Order) -> Result<Order>:
 
     // Recompute total from items, then validate computed value
     2. ACHIEVE "Recalculate order total from line items"
-    3. VALIDATE recalculated_total AS TYPE.Order.total
+    3. VALIDATE recalculated_total AS TYPE.Decimal
 
     // Cross-check
     4. ENSURE recalculated_total == order.total

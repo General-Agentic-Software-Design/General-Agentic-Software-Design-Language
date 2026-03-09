@@ -15,6 +15,7 @@ TRACE: "SRS-101 (User Registration)"
 DECISION "Security":
     CHOSEN: "bcrypt"
     RATIONALE: "Requirement for cost-factor adjustability"
+    ALTERNATIVES: ["Argon2id", "scrypt"]
 
 TYPE UserRegistration:
     email: String @format("email") @unique
@@ -26,7 +27,7 @@ COMPONENT RegistrationService:
 
 FLOW register(data):
     // 1. Validation (Schema check)
-    1. VALIDATE data
+    1. VALIDATE data AS TYPE.UserRegistration
 
     // 2. Business Logic Checks
     2. ENSURE uniqueness(data.email)

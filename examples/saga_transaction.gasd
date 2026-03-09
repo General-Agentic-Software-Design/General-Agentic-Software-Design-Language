@@ -16,7 +16,12 @@ TRACE: "SRS-205 (Order Reliability)", "SRS-210 (Inventory Consistency)"
 DECISION "Transaction Pattern":
     CHOSEN: "SAGA Choreography"
     RATIONALE: "Avoids central orchestrator bottleneck, better scalability"
+    ALTERNATIVES: ["SAGA Orchestration", "Two-Phase Commit"]
     AFFECTS: [OrderService, InventoryService, PaymentService]
+
+TYPE OrderService: id: UUID
+TYPE InventoryService: id: UUID
+TYPE PaymentService: id: UUID
 
 // --- Types ---
 TYPE OrderSagaData:
@@ -25,6 +30,10 @@ TYPE OrderSagaData:
     amount: Decimal
     items: List<OrderItem>
     state: Enum(PENDING, RESERVED, PAID, SHIPPED, CANCELLED)
+
+TYPE OrderItem:
+    product_id: UUID
+    quantity: Integer
 
 // --- Components ---
 COMPONENT OrderWorkflow:
@@ -37,7 +46,7 @@ COMPONENT OrderWorkflow:
 FLOW execute_order(order):
     @transaction_type("SAGA")
     
-    1. VALIDATE order
+    1. VALIDATE order AS TYPE.OrderSagaData
     2. ACHIEVE "Initialize State":
         state: "PENDING"
     3. PERSIST order

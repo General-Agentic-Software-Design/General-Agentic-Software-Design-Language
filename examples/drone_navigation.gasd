@@ -16,7 +16,16 @@ TRACE: "SRS-501 (Safety Critical)", "SRS-505 (Human Override)"
 DECISION "Computer Vision Model":
     CHOSEN: "YOLOv8-Tiny"
     RATIONALE: "Low latency inference required on edge hardware"
+    ALTERNATIVES: ["YOLOv8-Medium", "MobileNetV3"]
     AFFECTS: [VisionSystem]
+
+TYPE VisionSystem:
+    id: UUID
+    model: String
+
+TYPE MotorMixer: id: UUID
+TYPE BatteryManager: id: UUID
+TYPE CommLink: id: UUID
 
 // --- Types ---
 TYPE Waypoint:
@@ -54,7 +63,7 @@ FLOW autonomous_landing(current_loc: Waypoint):
        This generates a blocking UI/API call in the implementation.
     */
     3. IF hazards.contains(h -> h.confidence < 0.8 OR h.type == UNKNOWN):
-        QUESTION: "Landing zone has unidentified obstacles. Proceed?"
+        ACHIEVE "Ask operator: Landing zone has unidentified obstacles. Proceed?"
             BLOCKING: TRUE
             CONTEXT: Image(current_loc.camera_feed)
         
