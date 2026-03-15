@@ -51,7 +51,7 @@ DECISION "Payment Provider":
     ALTERNATIVES: ["Braintree", "Adyen"]
     AFFECTS: [PaymentService]
 
-TYPE PaymentService: id: UUID
+
 
 DECISION "Inventory Strategy":
     CHOSEN: "Optimistic Reservation"
@@ -68,14 +68,7 @@ COMPONENT CustomerRepository:
 COMPONENT OrderRepository:
     INTERFACE:
         save(order: Order) -> Void
-TYPE UUID:
-    val: String
 
-TYPE Decimal:
-    val: Float
-
-TYPE Result:
-    success: Boolean
 
 // --- Components ---
 
