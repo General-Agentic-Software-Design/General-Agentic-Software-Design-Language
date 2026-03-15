@@ -23,8 +23,4 @@ TYPE UserInfo:
     email: String @format("email")
     role: Enum(ADMIN, USER, GUEST)
 
-TYPE UUID:
-    val: String
 
-TYPE Decimal:
-    val: Float

@@ -34,24 +34,15 @@ TYPE UserCredentials @sensitive:
     password_hash: String @mask
     totp_secret: String @mask @encrypted
 
-TYPE UUID:
-    val: String
-
-TYPE Result:
-    success: Boolean
-
-TYPE Void:
-    done: Boolean
-
 TYPE SystemStatus:
     code: String
 
 // --- 4. Error Handling, 5. Logging, & 6. Monitoring ---
 COMPONENT OrderProcessingService:
     INTERFACE:
-        process_order(order_id: UUID, user_id: UUID) -> Result
+        process_order(order_id: UUID, user_id: UUID) -> Result<Boolean>
 
-FLOW process_order(order_id, user_id) -> Result:
+FLOW process_order(order_id, user_id) -> Result<Boolean>:
     @authorized("ROLE_USER")
     @trace_id(order_id)
     
@@ -63,7 +54,7 @@ FLOW process_order(order_id, user_id) -> Result:
         ON_ERROR:
             LOG "Inventory validation failed" @severity("ERROR")
             UPDATE Metric "order_failures" @increment @labels(reason="inventory")
-            RETURN Result.failure
+            RETURN Result.failure("Inventory validation failed")
             
     3. ACHIEVE "Execute Payment"
         @retry(3)
@@ -73,13 +64,13 @@ FLOW process_order(order_id, user_id) -> Result:
             LOG "Payment gateway timed out after retries" @severity("CRITICAL")
             UPDATE Metric "order_failures" @increment @labels(reason="payment_timeout")
             ACHIEVE "Notify Operations"
-            RETURN Result.failure
+            RETURN Result.failure("Payment gateway timed out")
             
     4. ACHIEVE "Update Order Status"
     
     5. LOG "Order processed successfully" @severity("INFO")
     6. UPDATE Metric "orders_completed" @increment
-    7. RETURN Result.success
+    7. RETURN Result.success(TRUE)
 
 COMPONENT HealthMonitor:
     INTERFACE:

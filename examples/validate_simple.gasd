@@ -1,6 +1,7 @@
 CONTEXT: "User Profile Service"
 TARGET: "TypeScript"
-TRACE: "SRS-201 (User Profile Validation)"
+TRACE: "SRS-201"
+NAMESPACE: "examples.validation"
 
 /*
    --- Simple VALIDATE AS Example ---
@@ -12,7 +13,8 @@ TRACE: "SRS-201 (User Profile Validation)"
    - The transpiler generates runtime guards for all @annotations on the bound TYPE
 */
 
-// --- Types with @annotation contracts ---
+// --- Core Types ---
+
 
 TYPE Email:
     value: String @format("email") @min_length(5) @max_length(254)
