@@ -8,7 +8,9 @@ GASD is a **Design Bridge Language** that connects upstream Requirements (SRS) t
 
 GASD is an evolving standard. The specifications, tutorials, and examples are organized by version within this repository.
 
-* **[GASD 1.1 (Current Latest)](./GASD-1.1/README.md)**
+* **[GASD 1.2 (Current Latest)](./GASD-1.2/README.md)**
+  * Includes GEP-6 (GASD 1.2 — Formal Semantics, Contract Modeling, and Verification Support).
+* **[GASD 1.1 (Previous Latest)](./GASD-1.1/README.md)**
   * Includes GEP-2 (Literal Types).
   * Includes GEP-3 (Missing Flow Keywords: TRANSFORM, ON_ERROR, THROW, UPDATE, APPLY).
   * Includes GEP-4 (Grammar Flexibility, Pattern Matching, and Resource Specification).
