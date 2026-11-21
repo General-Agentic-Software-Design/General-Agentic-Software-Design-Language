@@ -6,11 +6,12 @@ GASD is a **Design Bridge Language** that connects upstream Requirements (SRS) t
 
 ## Specifications and Versions
 
-GASD is an evolving standard. The specifications, tutorials, and examples are organized by version within this repository.
+GASD is an evolving standard. The specifications and tutorials are organized by version, and the bundled examples target GASD 1.2.
 
-* **[GASD 1.2 (Current Latest)](./GASD-1.2/README.md)**
-  * Includes GEP-6 (GASD 1.2 — Formal Semantics, Contract Modeling, and Verification Support).
-* **[GASD 1.1 (Previous Latest)](./GASD-1.1/README.md)**
+* **[GASD 1.2 (Latest)](./GASD-1.2/README.md)**
+  * Formalizes language semantics and adds interface contracts and verification support. [GEP-6](./GEPS/GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support)
+  * Defines contract validation, optional `WHEN` guards on behavior cases, and how to check observed calls. [GEP-7](./GEPS/GEP-7%3A%20GASD%201.2%20Contract%20Validation%20and%20Case%20Guards.md)
+* **[GASD 1.1](./GASD-1.1/README.md)**
   * Includes GEP-2 (Literal Types).
   * Includes GEP-3 (Missing Flow Keywords: TRANSFORM, ON_ERROR, THROW, UPDATE, APPLY).
   * Includes GEP-4 (Grammar Flexibility, Pattern Matching, and Resource Specification).
@@ -62,13 +63,11 @@ The GASD language is supported by a growing ecosystem of tools and resources:
 
 ## Documentation (Version Specific)
 
-Please navigate to the version folders above to view the standard documentation:
-
-* **Specification**: The official normative reference with strict grammar and compliance rules.
-* **Self-Definition**: The official AI-readable ground truth and metamodel of the language.
-* **Tutorial**: A comprehensive guide for engineers to master GASD.
-* **Examples**: Real-world design patterns and algorithmic strategies.
-* **Design Principles**: The underlying philosophy of the Design Bridge.
+* Read the normative rules and formal grammar in the [GASD 1.2 specification](./GASD-1.2/GASD_Specification.md).
+* Explore the machine-readable [GASD 1.2 self-definition](./GASD-1.2/gasd-1.2.0.gasd).
+* Learn the language with the [GASD 1.2 tutorial](./GASD-1.2/GASD_Tutorial.md).
+* Browse standalone and multi-file designs in the [GASD 1.2 examples](./examples/gasd-1.2).
+* Read the rationale for the Design Bridge in the [Design Principles](./Design_Principles.md).
 
 ## Getting Started
 
