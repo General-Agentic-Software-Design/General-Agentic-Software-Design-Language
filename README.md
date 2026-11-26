@@ -57,6 +57,7 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 * Learn the language with the [GASD 1.2 tutorial](./GASD-1.2/GASD_Tutorial.md).
 * Browse standalone and multi-file designs in the [GASD 1.2 examples](./examples/gasd-1.2).
 * Read the rationale for the Design Bridge in the [Design Principles](./Design_Principles.md).
+* Keep a local reference to the specs in another repository by [linking to the GASD specifications](./linking-to-gasd-spec.md).
 
 ## Getting Started
 
