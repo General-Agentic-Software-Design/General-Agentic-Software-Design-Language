@@ -101,27 +101,27 @@ ASSUMPTION "DI container configured correctly":
     CONSEQUENCE: "Components will not be resolved if DI container is misconfigured."
 
 ASSUMPTION "Thread pool size >= required concurrency":
-    AFFECTS: [@async]
+    AFFECTS: ["@async"]
     CONSEQUENCE: "Async operations may block if thread pool is exhausted."
 
 ASSUMPTION "Encryption key management configured":
-    AFFECTS: [@sensitive]
+    AFFECTS: ["@sensitive"]
     CONSEQUENCE: "Sensitive data may be exposed if encryption is not configured."
 
 ASSUMPTION "Auth service available":
-    AFFECTS: [@authorized]
+    AFFECTS: ["@authorized"]
     CONSEQUENCE: "Authorization checks will fail if auth service is unavailable."
 
 ASSUMPTION "External service latency within bounds":
-    AFFECTS: [@timeout]
+    AFFECTS: ["@timeout"]
     CONSEQUENCE: "TimeoutException behavior undefined if external service exceeds expected latency."
 
 ASSUMPTION "Cache infrastructure available":
-    AFFECTS: [@cacheable]
+    AFFECTS: ["@cacheable"]
     CONSEQUENCE: "Caching will be bypassed if cache infrastructure is unavailable."
 
 ASSUMPTION "DB-level unique constraint exists":
-    AFFECTS: [@unique]
+    AFFECTS: ["@unique"]
     CONSEQUENCE: "Uniqueness enforcement may be inconsistent without DB-level constraint."
 
 // --- 5. Standard Annotation Library (Section 14) ---
@@ -562,7 +562,7 @@ COMPONENT GasdTranspiler @injectable AS TRANSPILER_INJECTABLE @status("OFFICIAL"
 FLOW transpile_process(source: String, target: String) -> String:
     @error_strategy("Fail-Fast") AS TRANSPILE_ERROR_STRATEGY
     
-    1. VALIDATE source AS TYPE.String @format("UTF-8") AS VALIDATE_SOURCE_FORMAT
+    1. VALIDATE source AS TYPE.String
     2. ACHIEVE "Lexical Analysis"
         POSTCONDITION: result.tokens IS List
     3. ACHIEVE "Syntactic Parsing" @heuristic("Follow EBNF Grammar") AS PARSING_HEURISTIC
