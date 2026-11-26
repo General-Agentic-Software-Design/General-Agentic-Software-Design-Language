@@ -6,7 +6,9 @@ Run the commands from the root of **your project’s repository**, on the branch
 
 ## Git subtree
 
-A subtree tracks the GASD files as part of your project, so a regular clone includes them. `--prefix=GASDSpecs` sets the destination, `main` selects the upstream branch, and `--squash` groups each import or update into a single upstream snapshot commit that Git merges into your branch. See the [Git subtree manual](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.adoc).
+A subtree tracks the GASD files as part of your project, so a regular clone includes them. `--prefix=GASDSpecs` sets the destination, and `main` selects the upstream branch.
+
+**Use `--squash` on the initial `git subtree add` and on every `git subtree pull`.** Git groups the upstream changes for each import or update into a single snapshot commit and merges that commit into your branch. See the [Git subtree manual](https://github.com/git/git/blob/master/contrib/subtree/git-subtree.adoc).
 
 ### Add the subtree
 
