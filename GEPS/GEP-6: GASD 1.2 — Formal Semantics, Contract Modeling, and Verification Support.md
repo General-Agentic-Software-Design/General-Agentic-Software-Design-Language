@@ -945,7 +945,7 @@ The `GASD-1.1/` directory contains the following artifacts. Each MUST be replica
 | `GASD_Specification.md` | Normative specification with grammar, constructs, and annotation library | `GASD-1.2/GASD_Specification.md` |
 | `GASD_Tutorial.md` | Comprehensive guide for engineers to learn GASD | `GASD-1.2/GASD_Tutorial.md` |
 | `README.md` | Overview, getting started, and changelog | `GASD-1.2/README.md` |
-| `gasd-1.1.0.gasd` | Self-definition metamodel (AI-readable ground truth) | `GASD-1.2/gasd-1.2.0.gasd` |
+| `gasd-1.1.0.gasd` | Self-definition metamodel (AI-readable ground truth) | `GASD-1.2/gasd-1.2.gasd` |
 
 ### Generation Rules
 
@@ -964,7 +964,7 @@ The `GASD-1.1/` directory contains the following artifacts. Each MUST be replica
    - New §: MODEL block (after §12 Resources)
    - New §: Linting Engine
 3. Replace Appendix A EBNF with the complete GASD 1.2 grammar from this GEP
-4. Update Appendix D Changelog with version 1.2.0 entry
+4. Update Appendix D Changelog with version 1.2 entry
 5. **Verify**: diff against GASD 1.1 source MUST show zero deletions, only additions
 
 **For `GASD_Tutorial.md`:**
@@ -985,18 +985,18 @@ The `GASD-1.1/` directory contains the following artifacts. Each MUST be replica
 **For `README.md`:**
 
 1. Copy `GASD-1.1/README.md` verbatim
-2. Update title to "GASD 1.2.0"
-3. Add changelog entry for version 1.2.0 listing all GEP-6 EPICs
+2. Update title to "GASD 1.2"
+3. Add changelog entry for version 1.2 listing all GEP-6 EPICs
 4. Update documentation links to reference GASD 1.2 artifacts
 
-**For `gasd-1.2.0.gasd`:**
+**For `gasd-1.2.gasd`:**
 
 1. Copy `GASD-1.1/gasd-1.1.0.gasd` verbatim
 2. Add TYPE, COMPONENT, and FLOW definitions for each new construct:
    - `TYPE PostconditionExpr`, `TYPE ContractDef`, `TYPE CaseDef`
    - `TYPE ModelDef`, `TYPE AssumptionDef`, `TYPE VersionDecl`
    - `TYPE DependsOnClause`, `TYPE ScopeQualifier`, `TYPE ObligationId`
-3. Update VERSION and metadata to 1.2.0
+3. Update VERSION and metadata to 1.2
 4. **Verify**: the self-definition MUST be a valid GASD 1.2 file that parses without errors
 
 ### Acceptance Criteria
@@ -1005,7 +1005,7 @@ The `GASD-1.1/` directory contains the following artifacts. Each MUST be replica
 AT-GEP6-IMPL-001  GASD-1.2/ directory exists with all 4 artifacts
 AT-GEP6-IMPL-002  GASD-1.2/GASD_Specification.md diff vs GASD-1.1 shows zero deletions
 AT-GEP6-IMPL-003  GASD-1.2/GASD_Tutorial.md diff vs GASD-1.1 shows zero deletions
-AT-GEP6-IMPL-004  GASD-1.2/gasd-1.2.0.gasd parses without errors
+AT-GEP6-IMPL-004  GASD-1.2/gasd-1.2.gasd parses without errors
 AT-GEP6-IMPL-005  All new constructs from GEP-6 EPICs 1-10 are present in the specification
 AT-GEP6-IMPL-006  Complete EBNF grammar in Appendix A matches GEP-6 grammar exactly
 AT-GEP6-IMPL-007  README changelog references GEP-6 and all 10 EPICs

@@ -1,4 +1,4 @@
-# GASD 1.2.0 — Official Authoritative General Agentic Software Design Language
+# GASD 1.2 — Official Authoritative General Agentic Software Design Language
 
 ## 1. Introduction
 
@@ -11,7 +11,7 @@ SRS / User Stories  →  GASD (Design Bridge)  →  Transpiled Code
   "What is needed"      "How to architect it"     "Runnable output"
                         + constraints for
                         deterministic generation
-                        ```
+```
 
 **GASD does NOT contain:**
 
@@ -51,7 +51,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 
 #### 1.2.1 Determinism Conformance
 
-A GASD Transpiler **MUST** produce identical output for the same GASD source and target platform. Any variance in the generated implementation **SHALL** be considered a violation of the GASD 1.2.0 specification.
+A GASD Transpiler **MUST** produce identical output for the same GASD sources, target platform, and build configuration.
 
 ---
 
@@ -105,14 +105,15 @@ Global settings that inform the transpiler and link to upstream requirements.
 - **Directives**: `[DIRECTIVE]: "[Value]"`
 - **Imports**: `IMPORT "[File Path]"` or `IMPORT "[File Path]" AS [Alias]`
 - **Namespace**: `NAMESPACE: "[Dot.Separated.Path]"`
+- **Entry point**: `ENTRYPOINT: [FlowIdentifier]`
 - **Annotations**: `@[Identifier]` or `@[Identifier]("[Value]")`
 
-A GASD file **MUST** begin with the `CONTEXT` and `TARGET` directives. The `NAMESPACE` directive **SHOULD** be provided to ensure logical grouping.
+After any `VERSION` directive, a GASD file **MUST** begin with `CONTEXT` and `TARGET`. The `NAMESPACE` directive **SHOULD** be provided to ensure logical grouping.
 
-4. **`VERSION`** *(GASD 1.2 addition)* — Declares the GASD specification version this file targets.
-   - `VERSION 1.2`
-   - VERSION **MUST** appear as the first directive, before `CONTEXT` and `TARGET`.
-   - Missing VERSION **SHALL** be treated as GASD 1.1 for backward compatibility.
+**`VERSION`** declares the GASD specification version this file targets.
+
+- `VERSION` **MUST** appear first, before `CONTEXT` and `TARGET`. A file that omits it **SHALL** be treated as GASD 1.1.
+- `VERSION 1.2` selects this specification. The legacy spelling `VERSION 1.2.0` also selects GASD 1.2.
 
 ```gasd
 VERSION 1.2
@@ -148,9 +149,34 @@ TRACE: "EPIC-007", "US-042", "AC-042-1"
 |---|---|
 | `CONTEXT` | Informs framework/library choices |
 | `TARGET` | Locks target language/version |
+| `ENTRYPOINT` | Selects the `FLOW` invoked on executable launch |
 | `@injectable` | Generates DI-compatible constructors |
 | `@mockable` | Generates interface abstractions for testing |
 | `@optimize(...)` | Guides performance-related code choices |
+
+### 3.1 Executable Entry Point (`ENTRYPOINT`)
+
+`ENTRYPOINT` is an optional top-level directive introduced in GASD 1.2. It follows `CONTEXT` and `TARGET` and can precede the referenced `FLOW`. Its value is one unquoted identifier using the same syntax as a `FLOW` name.
+
+```gasd
+VERSION 1.2
+CONTEXT: "Command-line application"
+TARGET: "Go"
+ENTRYPOINT: greet
+```
+
+#### Document validation
+
+- A document **MAY** declare at most one `ENTRYPOINT`. The parser **MUST** reject repeated declarations, including those with the same identifier, and declarations in documents that select an earlier version.
+- The identifier **MUST** resolve to exactly one top-level `FLOW` in the declaring document by its GASD name. The parser **MUST** report unresolved and ambiguous names, including names found only through an import. Target naming rules apply during generation.
+- The selected flow uses the ordinary rules for `FLOW` parameters, return types, and statements. The designer chooses the flow and any launch bindings for the selected target.
+- The parser **MUST** preserve each occurrence and its source location for validation and diagnostics.
+
+#### Combined executable validation
+
+When the caller selects executable validation, the parser **MUST** allow zero or one `ENTRYPOINT` across the entire executable. Count each distinct resolved source document once, including documents reached transitively through `IMPORT`. The count applies across namespaces, including files that omit `NAMESPACE`. The single declaration may appear in any included document and resolves in that document.
+
+For two or more declarations, the parser **MUST** report a duplicate-entry-point error with the file and line of every declaration, even when the identifiers match. The same check applies to single-file executable validation and to semantic validation for combined executable AST export.
 
 ---
 
@@ -754,12 +780,26 @@ GASD is designed for transpilation to any major programming language.
 
 ### Determinism Across Languages
 
-The constraint system ensures that for the **same GASD file + same TARGET**, the output is identical:
+The constraint system ensures identical output for the same GASD source, `TARGET`, and build configuration:
 
 ```text
 GASD + TARGET:"Python" → always produces the same Python code
 GASD + TARGET:"Java"   → always produces the same Java code
 ```
+
+### 13.1 Executable Entry-Point Generation
+
+When `ENTRYPOINT` is present, the generator **MUST** use the validated flow and its declaring document to select the startup behavior. It **MUST** verify that the target language, version, and runtime support standalone execution and can implement the flow and its launch bindings. Supply parameters and handle the result according to the design or build configuration. When these specify process exit status, the generator **MUST** preserve the required status and termination behavior. If the target cannot support a requirement or a required parameter has no compatible launch input, generation **MUST** fail with a diagnostic identifying the target and the unsupported requirement or parameter.
+
+For a target with a required entry function or method, compare its required name with the flow's emitted name.
+
+- If the names match and the entry function can preserve the designed behavior, the generator **MUST** emit the flow body directly in the native entry point.
+- If the names differ, the generator **MUST** preserve the flow's ordinary emitted name and generate the native launcher with a direct call to that flow.
+- A matching name can still require a separate callable flow, for example when the native function cannot accept the required inputs or cannot be called from another flow. If a launcher and the separate flow would have the same name, the generator **MUST** assign the flow a distinct, deterministic name and use that name at every call site.
+
+For file-based targets, the generator **MAY** emit the flow body in the launch file or emit a function and call it directly from the launch file. It **MUST** preserve any import behavior specified by the design. An executable generated with `ENTRYPOINT` **MUST** execute the selected flow once on normal launch. If the directive is omitted, startup follows the applicable target or build configuration. In library and host-managed designs, the caller or host can control invocation.
+
+The same Hello World design has direct and launcher forms for C, C++, Go, Rust, Java, Scala, Python, Node.js, C#, Kotlin, and Swift. [GEP-8 target mappings](../GEPS/GEP-8%3A%20GASD%201.2%20-%20Target-Independent%20Executable%20Entry%20Point.md#hello-world-across-targets)
 
 ---
 
@@ -933,13 +973,13 @@ GASD 1.2 analyzers **MUST** implement the following lint rules:
 
 ## Appendix A: Formal EBNF Grammar
 
-The following is the formal Extended Backus-Naur Form (EBNF) grammar for GASD.
+The following is the formal Extended Backus-Naur Form (EBNF) grammar for GASD 1.2. Entry-point version, placement, and validation rules are defined in [§3.1](#31-executable-entry-point-entrypoint).
 
 ```ebnf
 (* GASD Grammar *)
 
 gasd_file     ::= [ version_stmt ] { section }
-section       ::= context_dir | namespace_stmt | import_stmt | decision_blk | type_def | component_def | contract_def | flow_def | strategy_def | constraint | model_def | assumption_def | resources_stmt
+section       ::= context_dir | namespace_stmt | import_stmt | entrypoint_stmt | decision_blk | type_def | component_def | contract_def | flow_def | strategy_def | constraint | model_def | assumption_def | resources_stmt
 
 resources_stmt::= "RESOURCES" ":" indent { resource_item } dedent
 resource_item ::= "-" string_literal [ annotations ]
@@ -951,6 +991,7 @@ version_number ::= unsigned_integer "." unsigned_integer [ "." unsigned_integer 
 context_dir   ::= ( "CONTEXT" | "TARGET" | "TRACE" ) ":" directive_value { "," directive_value }
 namespace_stmt::= "NAMESPACE" ":" string_literal
 import_stmt   ::= "IMPORT" string_literal [ "AS" identifier ]
+entrypoint_stmt ::= "ENTRYPOINT" ":" identifier
 directive_value ::= string_literal | number_literal | boolean_literal
 
 (* --- Decisions --- *)
@@ -1117,33 +1158,25 @@ Keywords in positions where they are clearly identifiers (e.g., as field names o
 
 ## Appendix B: Hello World Example
 
-The most minimal GASD file possible, demonstrating basic structure.
+This command-line design prints `Hello, World!` once when the executable launches.
 
 ```gasd
-CONTEXT: "General Software"
-TARGET: "Any"
-TRACE: "SRS-000 (Hello World)"
+VERSION 1.2
+CONTEXT: "Command-line application"
+TARGET: "Go"
+NAMESPACE: "example.hello"
+ENTRYPOINT: greet
 
-/* 
-   A minimal Hello World example
-   demonstrating basic component structure.
+CONSTRAINT: "Exit successfully on normal completion."
 
-   --- Step-by-Step Breakdown ---
-   1. Directives: CONTEXT and TARGET tell the transpiler this is a general-purpose design.
-   2. Component Definition: COMPONENT Greeter creates a class/module named "Greeter".
-   3. Interface: Defines the public method `say_hello` which returns a String.
-   4. Flow: FLOW say_hello() provides the implementation logic—simply returning a literal string.
-*/
-COMPONENT Greeter:
-    INTERFACE:
-        say_hello() -> String
-
-FLOW say_hello():
-    1. RETURN "Hello, World!"
-
+FLOW greet():
+    1. ACHIEVE "Write Hello, World! followed by a newline to standard output":
+        POSTCONDITION:
+            stdout.line_count == 1
+            stdout.last_line == "Hello, World!"
 ```
 
-See: [examples/hello_world.gasd](examples/hello_world.gasd)
+The postcondition observes standard output. `line_count` counts newline-terminated lines and `last_line` excludes the terminator. With `ENTRYPOINT: greet`, Go's `main` calls `greet`. Changing both the directive and the flow name to `main` lets the generator emit the greeting directly in Go's entry function. [Tutorial examples](GASD_Tutorial.md#34-selecting-the-startup-flow-with-entrypoint)
 
 ---
 
@@ -1157,9 +1190,9 @@ See: [examples/user_management.gasd](examples/user_management.gasd)
 
 ## Appendix D: Changelog
 
-### Version 1.2.0
+### Version 1.2
 
-Version 1.2.0 introduces **Formal Semantics, Contract Modeling, and Verification Support** (via GEP-6). New constructs are **REQUIRED** in files declaring `VERSION 1.2`:
+Version 1.2 introduces **Formal Semantics, Contract Modeling, and Verification Support** (via GEP-6). Files declaring `VERSION 1.2` **MUST** use the constructs marked as required where applicable.
 
 - **VERSION Directive** (EPIC 10): Declares the GASD specification version a file targets. MUST appear as first directive.
 - **POSTCONDITION for ACHIEVE** (EPIC 2): Formalizes ACHIEVE outcomes with decidable postcondition expressions. REQUIRED on all ACHIEVE in 1.2.
@@ -1171,6 +1204,7 @@ Version 1.2.0 introduces **Formal Semantics, Contract Modeling, and Verification
 - **ASSUMPTION Block** (EPIC 8): Explicit declaration of environmental assumptions with AFFECTS and CONSEQUENCE.
 - **Annotation Semantic Triples** (EPIC 1): Every annotation decomposed into structural predicate, runtime contract, and environmental dependency.
 - **Linting Engine** (EPIC 9): 12 mandatory lint rules with version-aware severity (Error in 1.2, Warning in 1.1).
+- **Executable entry points.** Adds the optional `ENTRYPOINT` directive for standalone executables, with validation across all source files in a combined executable and rules for direct emission and native launchers. [GEP-8](../GEPS/GEP-8%3A%20GASD%201.2%20-%20Target-Independent%20Executable%20Entry%20Point.md)
 
 ### Version 1.1.0
 

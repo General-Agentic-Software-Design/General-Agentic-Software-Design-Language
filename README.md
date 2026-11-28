@@ -9,7 +9,8 @@ GASD is a **Design Bridge Language** that connects upstream Requirements (SRS) t
 GASD is an evolving standard. The specifications and tutorials are organized by version, and the bundled examples target GASD 1.2.
 
 * **[GASD 1.2 (Latest)](./GASD-1.2/README.md)**
-  * Formalizes language semantics and adds interface contracts and verification support. [GEP-6](./GEPS/GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support)
+  * Adds the optional `ENTRYPOINT` directive for selecting the startup flow of an executable. [GEP-8](./GEPS/GEP-8%3A%20GASD%201.2%20-%20Target-Independent%20Executable%20Entry%20Point.md)
+  * Formalizes language semantics and adds interface contracts and verification support. [GEP-6](./GEPS/GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support.md)
   * Defines contract validation, optional `WHEN` guards on behavior cases, and how to check observed calls. [GEP-7](./GEPS/GEP-7%3A%20GASD%201.2%20Contract%20Validation%20and%20Case%20Guards.md)
 * **[GASD 1.1](./GASD-1.1/README.md)**
   * Includes GEP-2 (Literal Types).
@@ -53,7 +54,7 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 ## Documentation (Version Specific)
 
 * Read the normative rules and formal grammar in the [GASD 1.2 specification](./GASD-1.2/GASD_Specification.md).
-* Explore the machine-readable [GASD 1.2 self-definition](./GASD-1.2/gasd-1.2.0.gasd).
+* Explore the machine-readable [GASD 1.2 self-definition](./GASD-1.2/gasd-1.2.gasd).
 * Learn the language with the [GASD 1.2 tutorial](./GASD-1.2/GASD_Tutorial.md).
 * Browse standalone and multi-file designs in the [GASD 1.2 examples](./examples/gasd-1.2).
 * Read the rationale for the Design Bridge in the [Design Principles](./Design_Principles.md).

@@ -1,6 +1,6 @@
-# Mastering GASD 1.2.0: The Official Guide
+# Mastering GASD 1.2: The Official Guide
 
-Welcome to **GASD 1.2.0 (General Agentic Software Design Language)**. This tutorial will take you from the basics of design-level abstraction to expert-level techniques for generating deterministic, production-ready code. GASD is the **Official Authoritative** technical standard for AI-human architectural collaboration.
+Welcome to **GASD 1.2 (General Agentic Software Design Language)**. This tutorial will take you from the basics of design-level abstraction to expert-level techniques for generating deterministic, production-ready code. GASD is the **Official Authoritative** technical standard for AI-human architectural collaboration.
 
 ---
 
@@ -35,7 +35,7 @@ By strictly separating these concerns, GASD makes code generation:
 > [!IMPORTANT]
 > **GASD Rule #1**: If the agent has a choice, you haven't written enough GASD.
 >
-> **GASD Rule #2**: All design elements **MUST** align with the [Official Self-Definition](gasd-1.2.0.gasd).
+> **GASD Rule #2**: All design elements **MUST** align with the [Official Self-Definition](gasd-1.2.gasd).
 
 ---
 
@@ -43,9 +43,10 @@ By strictly separating these concerns, GASD makes code generation:
 
 ### 2.1 Setting the Stage: `CONTEXT`, `TARGET`, and `TRACE`
 
-Every GASD file starts with directives that tell the transpiler what environment it's targeting and which upstream artifacts it fulfills. `TRACE` supports any traceable identifier — SRS requirements, User Stories, Epics, or Acceptance Criteria.
+Begin with `VERSION 1.2` to select this release. `CONTEXT` and `TARGET` describe the implementation environment. `TRACE` links the design to upstream artifacts such as requirements, user stories, or acceptance criteria.
 
 ```gasd
+VERSION 1.2
 CONTEXT: "Microservices Architecture / Kubernetes"
 TARGET: "Rust 1.70+"
 
@@ -171,6 +172,40 @@ FLOW process_order(order: Order) -> Receipt:
         POSTCONDITION: result.shipped == true
     5. RETURN Receipt
 ```
+
+### 3.4 Selecting the Startup Flow with `ENTRYPOINT`
+
+For an executable, add `ENTRYPOINT: greet` after `CONTEXT` and `TARGET` to run the top-level `FLOW greet` in the same file. The directive uses the GASD flow name. Choose any signature and body the selected target can implement, and specify launch inputs or result handling when your design requires them. [Entry-point validation](GASD_Specification.md#31-executable-entry-point-entrypoint)
+
+The Hello World design uses `ENTRYPOINT: greet`. Since Go's entry function is `main`, the generated launcher calls `greet` directly. [Hello World design](GASD_Specification.md#appendix-b-hello-world-example)
+
+```go
+package main
+
+import "fmt"
+
+func greet() {
+	fmt.Println("Hello, World!")
+}
+
+func main() {
+	greet()
+}
+```
+
+Rename the flow to `main` and use `ENTRYPOINT: main` to emit the same body directly in Go's entry function.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello, World!")
+}
+```
+
+An executable can omit the directive and use startup from its target or build configuration. If it declares one, that is the single `ENTRYPOINT` across all of its files, including imports and files in other namespaces. File-based targets such as Python and Node.js can also place startup code directly in the launch file. [Target examples](../GEPS/GEP-8%3A%20GASD%201.2%20-%20Target-Independent%20Executable%20Entry%20Point.md#hello-world-across-targets)
 
 ---
 
@@ -446,7 +481,7 @@ FLOW send_alert(request) -> Result<Void>:
 
 By adding these constructs:
 
-- **`VERSION 1.2`** forces all tools to strictly check these rules.
+- **`VERSION 1.2`** enables the verification rules described below.
 - **`ASSUMPTION`** makes our external reliance explicit for ops teams.
 - **`CONTRACT`** formally models the errors our code must handle from `EmailProvider`.
 - **`POSTCONDITION`** makes every `ACHIEVE` decidable to an analyzer.
@@ -519,7 +554,7 @@ QUESTION: "Should we use a cache-aside or write-through pattern for the session 
 
 ### 🚀 Tip 3: The AI-Readable Ground Truth
 
-Always refer to the [Official Self-Definition (gasd-1.2.0.gasd)](gasd-1.2.0.gasd) for the most precise mapping of language constructs. AI agents use this file as their normative reference for what is possible within the GASD 1.2.0 standard.
+The machine-readable self-definition provides the metamodel for GASD 1.2. [Official self-definition](gasd-1.2.gasd)
 
 ---
 
