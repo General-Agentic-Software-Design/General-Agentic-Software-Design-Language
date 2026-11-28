@@ -20,7 +20,7 @@ This proposal completes the grammar for GASD 1.2 contract parameters and defines
 
 # Motivation
 
-GASD 1.2 already defines `CONTRACT` blocks. Two gaps in that definition affect automated validation. Appendix A referenced `param_list` without defining it, even though GEP 6 included the production. A `CASE` also lacked a formal trigger for deciding when it applies. GEP 7 restores the missing production and adds optional `WHEN` guards so validators can determine case eligibility from the supplied inputs. [GASD 1.2 specification](../GASD-1.2/GASD_Specification.md#appendix-a-formal-ebnf-grammar) · [GEP 6](./GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support)
+GASD 1.2 already defines `CONTRACT` blocks. Two gaps in that definition affect automated validation. Appendix A referenced `param_list` without defining it, even though GEP 6 included the production. A `CASE` also lacked a formal trigger for deciding when it applies. GEP 7 restores the missing production and adds optional `WHEN` guards so validators can determine case eligibility from the supplied inputs. [GASD 1.2 specification](../GASD-1.2/GASD_Specification.md#appendix-a-formal-ebnf-grammar) · [GEP 6](./GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support.md)
 
 The inventory example exposed a separate enforcement gap. `InventoryService.release_stock` had no `BEHAVIORS` block, yet `gasd_parser` 2.1.6 reported a pass and emitted a contract with zero cases. The example now specifies success, failure, and the effect of repeating a release. [Inventory service example](../examples/gasd-1.2/multi-file/inventory_service.gasd)
 
@@ -116,7 +116,7 @@ Tools need to preserve `WHEN` in the AST before they can verify guarded cases. `
 
 # Reference Implementation (Optional)
 
-The written specification and GASD metamodel include the contract changes. `CaseDefinition.when` stores the guard expressions in source order. The repaired `release_stock` example uses `result` for success and `error` for failure, along with observable inventory postconditions. [GASD 1.2 specification](../GASD-1.2/GASD_Specification.md#61-contract-modeling--contract-gasd-12-addition) · [GASD metamodel](../GASD-1.2/gasd-1.2.0.gasd) · [Inventory service example](../examples/gasd-1.2/multi-file/inventory_service.gasd)
+The written specification and GASD metamodel include the contract changes. `CaseDefinition.when` stores the guard expressions in source order. The repaired `release_stock` example uses `result` for success and `error` for failure, along with observable inventory postconditions. [GASD 1.2 specification](../GASD-1.2/GASD_Specification.md#61-contract-modeling--contract-gasd-12-addition) · [GASD metamodel](../GASD-1.2/gasd-1.2.gasd) · [Inventory service example](../examples/gasd-1.2/multi-file/inventory_service.gasd)
 
 Parser and verifier work remains. Parse leading `WHEN` clauses into each case and retain them in syntactic and semantic AST exports. Validate the referenced interface signature, guard types and bindings, and case structure, including `LINT-007` for a contract with zero cases. Apply the eligibility and outcome rules when checking an observed call.
 
@@ -144,9 +144,9 @@ The observed parser results cover the 31 bundled files and the repaired inventor
 
 | Requirement | Specification and artifacts | Tests |
 | --- | --- | --- |
-| Parse typed contract signatures | [GASD 1.2 Appendix A](../GASD-1.2/GASD_Specification.md#appendix-a-formal-ebnf-grammar) and [GASD metamodel](../GASD-1.2/gasd-1.2.0.gasd) | `AT-GEP7-001`, `NT-GEP7-002` |
+| Parse typed contract signatures | [GASD 1.2 Appendix A](../GASD-1.2/GASD_Specification.md#appendix-a-formal-ebnf-grammar) and [GASD metamodel](../GASD-1.2/gasd-1.2.gasd) | `AT-GEP7-001`, `NT-GEP7-002` |
 | Require cases and observable outcomes | [GASD 1.2 contract rules and `LINT-007`](../GASD-1.2/GASD_Specification.md#static-validation), [inventory service example](../examples/gasd-1.2/multi-file/inventory_service.gasd) | `RT-GEP7-001`, `RT-GEP7-002`, `NT-GEP7-001` |
-| Preserve and evaluate guards | [GASD 1.2 call verification](../GASD-1.2/GASD_Specification.md#verifying-a-call) and [GASD metamodel](../GASD-1.2/gasd-1.2.0.gasd) | `AT-GEP7-002`, `AT-GEP7-003`, `NT-GEP7-003` |
+| Preserve and evaluate guards | [GASD 1.2 call verification](../GASD-1.2/GASD_Specification.md#verifying-a-call) and [GASD metamodel](../GASD-1.2/gasd-1.2.gasd) | `AT-GEP7-002`, `AT-GEP7-003`, `NT-GEP7-003` |
 | Report the status of observed outcomes | [GASD 1.2 call verification](../GASD-1.2/GASD_Specification.md#verifying-a-call) | `AT-GEP7-004` |
 
 ---

@@ -1,10 +1,10 @@
 VERSION 1.2
 /* 
-   GASD 1.2.0 — General Agentic Software Design Language
+   GASD 1.2 — General Agentic Software Design Language
    ====================================================
    Official Authoritative Self-Definition & Metamodel Reference
    Status: OFFICIAL
-   Version: 1.2.0
+   Version: 1.2
    Compliance: RFC 2119
    
    This file MUST be interpreted as the ground truth for GASD agents.
@@ -28,9 +28,10 @@ DECISION "Self-Definition Level":
 
 /// Defines the global settings that inform the transpiler.
 TYPE Directive:
-    type: Enum(VERSION, CONTEXT, TARGET, TRACE, NAMESPACE, IMPORT)
+    type: Enum(VERSION, CONTEXT, TARGET, TRACE, NAMESPACE, IMPORT, ENTRYPOINT)
     value: String @min_length(1) AS DIRECTIVE_VALUE_MIN
     alias: Optional<String> // Used for IMPORT AS
+    line: Optional<Integer> // One-based source line, required for ENTRYPOINT
 
 // --- 3. Abstract Data Types (Section 5) ---
 
@@ -92,6 +93,16 @@ TYPE GasdDocument:
     resources: Optional<List<ResourceItem>>
     questions: Optional<List<Question>>
     approvals: Optional<List<Approval>>
+
+/// The identity of the validated startup flow in its declaring document.
+TYPE ResolvedEntryPoint:
+    document_path: String
+    flow_name: String
+
+/// A single executable's distinct source documents and optional startup flow.
+TYPE ExecutableDesign:
+    documents: List<GasdDocument>
+    entrypoint: Optional<ResolvedEntryPoint>
 
 // --- 4. Assumptions for Annotations with Environmental Dependencies (Section 9.2 / Section 14.7) ---
 // NOTE: Declared before StandardAnnotation to satisfy LINT-012 ordering requirements.
@@ -513,14 +524,22 @@ CONSTRAINT: "A GASD Transpiler MUST NOT invent new annotations for functional lo
 CONSTRAINT: "All database operations SHALL be documented via PERSIST or ACHIEVE."
 CONSTRAINT: "Every COMPONENT MUST expose an INTERFACE."
 CONSTRAINT: "VALIDATE steps MUST include AS TYPE.X binding. Transpiler MUST error if binding is missing or resolves to undefined TYPE."
-CONSTRAINT: "In VERSION 1.2, ACHIEVE steps MUST include a POSTCONDITION block."
-CONSTRAINT: "In VERSION 1.2, IMPORT statements MUST have a corresponding CONTRACT definition."
-CONSTRAINT: "In VERSION 1.2, INVARIANT statements MUST specify LOCAL or GLOBAL scope."
-CONSTRAINT: "In VERSION 1.2, all annotations MUST include an AS identifier."
+CONSTRAINT: "In the GASD 1.2 series, ACHIEVE steps MUST include a POSTCONDITION block."
+CONSTRAINT: "In the GASD 1.2 series, IMPORT statements MUST have a corresponding CONTRACT definition."
+CONSTRAINT: "In the GASD 1.2 series, INVARIANT statements MUST specify LOCAL or GLOBAL scope."
+CONSTRAINT: "In the GASD 1.2 series, all annotations MUST include an AS identifier."
 CONSTRAINT: "AS obligation identifiers MUST be unique within file scope."
 CONSTRAINT: "AS obligation identifiers MUST match the pattern [A-Z][A-Z0-9_]*."
-CONSTRAINT: "In VERSION 1.2, missing AS identifier SHALL produce an error."
+CONSTRAINT: "In the GASD 1.2 series, missing AS identifier SHALL produce an error."
 CONSTRAINT: "In VERSION 1.1, missing AS identifiers are auto-generated deterministically from TYPE.field.annotation."
+CONSTRAINT: "Starting with VERSION 1.2, a document MAY use one ENTRYPOINT after CONTEXT and TARGET. Its unquoted identifier MUST name exactly one local top-level FLOW."
+CONSTRAINT: "The parser MUST preserve each ENTRYPOINT occurrence and its source line, and apply ordinary FLOW validation to the selected flow."
+CONSTRAINT: "Executable validation MUST allow zero or one ENTRYPOINT across distinct resolved documents, including transitive imports and every namespace. On duplicates, report the path and line of every declaration."
+CONSTRAINT: "The generator MUST check target support for the selected flow, its input bindings, and result handling. A generation error identifies any unsupported requirement and the target."
+CONSTRAINT: "For a named native entry point, a compatible matching emitted name MUST use the flow body directly. A different emitted name MUST be preserved and called directly by the native launcher."
+CONSTRAINT: "If a separate callable flow and the native launcher need the same name, the generator MUST assign the flow a distinct deterministic name and use it at every call site."
+CONSTRAINT: "A file or module launcher MAY contain the flow body or call the flow directly, preserving any designed import behavior. The selected flow MUST run once on normal launch."
+CONSTRAINT: "When ENTRYPOINT is omitted, the applicable target or build configuration controls executable startup."
 INVARIANT GLOBAL: "A FLOW MUST NOT contain implementation code."
 ENSURE: "Result<T> MUST force explicit handling of error states."
 
@@ -548,6 +567,7 @@ COMPONENT Linter:
 COMPONENT CodeGenerator:
     INTERFACE:
         generate(doc: GasdDocument) -> String
+        generate_executable(design: ExecutableDesign, target_platform: String) -> String
 
 /// The official GASD generation engine contract.
 COMPONENT GasdTranspiler @injectable AS TRANSPILER_INJECTABLE @status("OFFICIAL") AS TRANSPILER_STATUS:
@@ -557,6 +577,7 @@ COMPONENT GasdTranspiler @injectable AS TRANSPILER_INJECTABLE @status("OFFICIAL"
     INTERFACE:
         transpile(source_code: String, target_platform: String) -> ResultResult @trace("Section 13") AS TRANSPILE_TRACE
         validate_spec(doc_to_val: GasdDocument) -> List<Diagnostic>
+        validate_executable(documents: List<GasdDocument>) -> Result<ExecutableDesign>
 
 /// The normative process for code generation.
 FLOW transpile_process(source: String, target: String) -> String:

@@ -1,4 +1,4 @@
-# GASD 1.2.0 — Official Authoritative General Agentic Software Design Language
+# GASD 1.2 — Official Authoritative General Agentic Software Design Language
 
 GASD is a **Design Bridge Language** that connects upstream Requirements (SRS) to downstream Implementation (Code).
 
@@ -34,14 +34,14 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 ## Documentation
 
 - The formal grammar and conformance rules are in the [specification](GASD_Specification.md).
-- The machine-readable metamodel includes standard annotation definitions and environmental assumptions. [Self-definition](gasd-1.2.0.gasd)
+- The machine-readable metamodel includes directive, executable validation, and code-generation definitions. [Self-definition](gasd-1.2.gasd)
 - Learn the language with the [tutorial](GASD_Tutorial.md).
 - Browse the [GASD 1.2 examples](../examples/gasd-1.2), including the [user management service](../examples/gasd-1.2/user_management_v1_2.gasd) and the [multi-file order workflow](../examples/gasd-1.2/multi-file).
 - Read the rationale for the Design Bridge in the [Design Principles](../Design_Principles.md).
 
 ## Getting Started
 
-1. Draft a design from your user stories or software requirements specification. Begin the file with `VERSION 1.2` and set a `TARGET` for implementation.
+1. Draft a design from your user stories or software requirements specification. Begin the file with `VERSION 1.2` and set a `TARGET` for implementation. Use `ENTRYPOINT` to designate a startup flow when the GASD design defines one. [Hello World example](GASD_Specification.md#appendix-b-hello-world-example)
 2. Review the design decisions, validate the interface contracts, and identify evidence for the expected outcomes.
 3. Provide the reviewed design to your implementation agent or transpiler.
 
@@ -49,9 +49,10 @@ Standard natural language allows for "Agent Drift" — where the AI makes differ
 
 ## Changelog
 
-### Version 1.2.0
+### Version 1.2
 
-- **Formal semantics, contract modeling, and verification.** Adds the `VERSION` directive, `POSTCONDITION` for `ACHIEVE`, `CONTRACT` blocks at `IMPORT` boundaries, `DEPENDS_ON` step mappings, scoped `INVARIANT`s, environmental `ASSUMPTION`s, `MODEL` references for TLA+ and Alloy, and `AS` obligation identifiers for annotations. It defines 12 lint rules and describes annotation semantics in terms of structural predicates, runtime contracts, and environmental dependencies. [GEP-6](../GEPS/GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support)
+- **Executable entry points.** `ENTRYPOINT` optionally selects a local `FLOW` for startup. A combined executable can contain zero or one declaration across its source files and namespaces. Generators emit the flow directly in a compatible matching entry function or use a launcher to call it. [Specification](GASD_Specification.md#31-executable-entry-point-entrypoint) · [Tutorial](GASD_Tutorial.md#34-selecting-the-startup-flow-with-entrypoint) · [GEP-8](../GEPS/GEP-8%3A%20GASD%201.2%20-%20Target-Independent%20Executable%20Entry%20Point.md)
+- **Formal semantics, contract modeling, and verification.** Adds the `VERSION` directive, `POSTCONDITION` for `ACHIEVE`, `CONTRACT` blocks at `IMPORT` boundaries, `DEPENDS_ON` step mappings, scoped `INVARIANT`s, environmental `ASSUMPTION`s, `MODEL` references for TLA+ and Alloy, and `AS` obligation identifiers for annotations. It defines 12 lint rules and describes annotation semantics in terms of structural predicates, runtime contracts, and environmental dependencies. [GEP-6](../GEPS/GEP-6%3A%20GASD%201.2%20%E2%80%94%20Formal%20Semantics%2C%20Contract%20Modeling%2C%20and%20Verification%20Support.md)
 - **Contract validation and case guards.** Contracts must match the interface signature and declare at least one behavior case. Each case must specify a `POSTCONDITION` or `THROWS`, and `LINT-007` flags missing cases or outcomes. Optional `WHEN` guards determine which cases apply to the supplied inputs. A verifier checks the observed outcome against eligible cases and reports it as unverified when a case could match but evidence is missing. [GEP-7](../GEPS/GEP-7%3A%20GASD%201.2%20Contract%20Validation%20and%20Case%20Guards.md) · [Contract rules and guarded example](GASD_Specification.md#61-contract-modeling--contract-gasd-12-addition)
 
 The bundled inventory service shows success and failure cases for `release_stock`, including the observable effect of a repeated release. [Inventory service example](../examples/gasd-1.2/multi-file/inventory_service.gasd)
